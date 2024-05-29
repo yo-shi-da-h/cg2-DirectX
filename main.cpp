@@ -228,8 +228,6 @@ if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
 		}
 	}
 	
-	
-
 	//コマンドキューを生成する
 	ID3D12CommandQueue* commandQueue = nullptr;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
@@ -300,11 +298,6 @@ if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
 	rtvHandles[1].ptr=rtvHandles[0].ptr+device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	//これから書き込むバックバッファのインデックスを取得
 	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-	//描画先のRTVを設定する
-	commandList->OMSetRenderTargets(1,&rtvHandles[backBufferIndex],false,nullptr);
-	//指定した色で画面全体をクリアする
-	float clearColor[]={0.1f,0.25f,0.5f,1.0f};
-	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex],clearColor,0,nullptr);
 	//TransitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
 	//今回のバリアはTransition
