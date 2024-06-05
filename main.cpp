@@ -137,6 +137,11 @@ struct Vector3 {
 	float z;
 };
 
+struct Vector2 {
+	float x;
+	float y;
+};
+
 struct Matrix4x4 {
 	float m[4][4];
 };
@@ -168,6 +173,12 @@ struct Transform {
 	Vector3 scale;
 	Vector3 rotate;
 	Vector3 translate;
+};
+
+struct VertexData
+{
+	Vector4 position;
+	Vector2 texcoord;
 };
 
 #pragma region Affine
@@ -859,11 +870,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 		
 	//InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[1] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs[1].SemanticName = "TEXCOORD";
+	inputElementDescs[1].SemanticIndex = 0;
+	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
@@ -935,18 +950,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//SRVの生成
 	device->CreateShaderResourceView(textureResource,&srvDesc, textureSrvHandleCPU);
 
-	ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(Vector4) * 3);
+	ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 3);
 
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 
-	vertexBufferView.SizeInBytes = sizeof(Vector4) * 3;
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
 
-	vertexBufferView.StrideInBytes = sizeof(Vector4);
+	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-	
+	//頂点リソースにデータを書き込む
+	VertexData* vertexData = nullptr;
+	//書き込むためのアドレスを取得
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	//leftTop
+	vertexData[0].position = { -0.5f, -0.5f,0.0f,1.0f };
+	vertexData[0].texcoord = { 0.0f, 1.0f};
+
+	//Top
+	vertexData[1].position = { 0.0f, 0.5f,0.0f,1.0f };
+	vertexData[1].texcoord = { 0.5f, 0.0f};
+
+	//rightBottom
+	vertexData[2].position = { 0.5f, -0.5f,0.0f,1.0f };
+	vertexData[2].texcoord = { 1.0f, 1.0f};
+
 	ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
 
 	Matrix4x4* wvpDate = nullptr;
@@ -955,23 +985,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	*wvpDate = MakeIdentity4x4();
 
-
-
-	Vector4* vertexDate = nullptr;
-
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate));
-	//leftTop
-	vertexDate[0] = { -0.5f, -0.5f,0.0f,1.0f };
-
-	//Top
-	vertexDate[1] = { 0.0f, 0.5f,0.0f,1.0f };
-
-	//rightBottom
-	vertexDate[2] = { 0.5f, -0.5f,0.0f,1.0f };
-
-
 	//マテリアル用のリソース
-	ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(Vector4));
+	ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(VertexData));
 	//マテリアルにデータを書き込む
 	Vector4* materialDate = nullptr;
 	//書き込むためのアドレス
