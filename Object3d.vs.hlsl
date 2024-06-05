@@ -10,7 +10,7 @@ ConstantBuffer<TransformationMatrix> gTranfsformationMatrix : register(b0);
 struct VertexShaderInput
 {
     float32_t4 posision : POSITION;
-    float32_t4 texcoord : TEXCOORD0;
+    float32_t2 texcoord : TEXCOORD0;
 };
 
 VertexShaderOutput main(VertexShaderInput input)
