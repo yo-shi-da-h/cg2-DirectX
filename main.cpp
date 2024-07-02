@@ -531,21 +531,6 @@ ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t 
 	depthClearValue.DepthStencil.Depth = 1.0f;
 	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	ID3D12Resource* resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
-		&heapProperties,
-		D3D12_HEAP_FLAG_NONE,
-		&resourceDesc,
-		D3D12_RESOURCE_STATE_DEPTH_WRITE,
-		&depthClearValue,
-		IID_PPV_ARGS(&resource));
-	assert(SUCCEEDED(hr));
-	return resource;
-	
-}
-
-
-
 //ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg,
 
