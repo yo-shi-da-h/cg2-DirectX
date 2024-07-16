@@ -902,8 +902,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	ID3D12Resource* textureResource = CreateTextureResource(device, metadata);
-	ID3D12Resource* val = UploadTextureData(textureResource, mipImages,device,commandList);
+	//ID3D12Resource* val = UploadTextureData(textureResource, mipImages,device,commandList);
 	ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+	ID3D12Resource* intermediateResource = UploadTextureData(textureResource, mipImages,device,commandList);
 
 	// DSVの設定
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
@@ -1177,7 +1178,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxgiFactory->Release();
 	wvpResource->Release();
 	textureResource->Release();
-	val->Release();
+	intermediateResource->Release();
 	
 
 #ifdef _DEBUG
