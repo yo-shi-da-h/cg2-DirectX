@@ -24,9 +24,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 
 // ウィンドウプロシージャ
-LRESULT CALLBACKWindowProc(
-HWND hwnd, UINTmsg,
-WPARAM wparam, LPARAMlparam) {
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
 		return true;
 	}
