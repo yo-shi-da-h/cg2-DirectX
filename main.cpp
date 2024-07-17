@@ -354,14 +354,30 @@ float cot(float theta) {
 	return 1 / std::tanf(theta);
 }
 
-Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
+Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip)
+{
+	Matrix4x4 result = { 0 };
 
-	Matrix4x4 result = {};
-	result.mat[0][0] = 1.0f / aspectRatio * cot(fovY / 2);
-	result.mat[1][1] = cot(fovY / 2);
+	result.mat[0][0] = (1 / aspectRatio) / tanf(fovY / 2);
+	result.mat[0][1] = 0;
+	result.mat[0][2] = 0;
+	result.mat[0][3] = 0;
+
+	result.mat[1][0] = 0;
+	result.mat[1][1] = 1 / tanf(fovY / 2);
+	result.mat[1][2] = 0;
+	result.mat[1][3] = 0;
+
+	result.mat[2][0] = 0;
+	result.mat[2][1] = 0;
 	result.mat[2][2] = farClip / (farClip - nearClip);
-	result.mat[2][3] = 1.0f;
-	result.mat[3][2] = (-nearClip + farClip) / (farClip - nearClip);
+	result.mat[2][3] = 1;
+
+	result.mat[3][0] = 0;
+	result.mat[3][1] = 0;
+	result.mat[3][2] = (-nearClip * farClip) / (farClip - nearClip);
+	result.mat[3][3] = 0;
+
 	return result;
 }
 
@@ -1101,7 +1117,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			commandList->SetGraphicsRootSignature(rootSignature);
 			commandList->SetPipelineState(graphicsPipelineState);
 			
-			commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+			//commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
