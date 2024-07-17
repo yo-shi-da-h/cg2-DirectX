@@ -98,7 +98,7 @@ L"Begin CompileShader,path:{}\n", filePath, profile)));
 	// hlslファイルを読む
 	IDxcBlobEncoding* shaderSource =
 nullptr;
-	HRESULThr = dxcUtils->LoadFile(filePath.c_str(), nullptr,&shaderSource);
+	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr,&shaderSource);
 	// 読めなかったら止まる
 	assert(SUCCEEDED(hr));
 	// 読み込んだファイルの内容を設定する
