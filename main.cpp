@@ -629,7 +629,7 @@ resource;
 
 
 // Windowsアプリでのエントリーポイント(main関数)
-int WINAPIWinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
