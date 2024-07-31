@@ -8,11 +8,13 @@
 #include <dxgidebug.h>
 #include <dxcapi.h>
 #include <math.h>
+#include <numbers>
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
+#include <corecrt_math_defines.h>
 
 
 #pragma comment(lib,"d3d12.lib")
@@ -113,7 +115,7 @@ L"-E",
 L"main",
 L"-T",profile,
 L"-Zi",
-L"Qembed_debug",
+L"-Qembed_debug",
 L"-Zpr",
 
 	};
@@ -1024,7 +1026,7 @@ Transform transform
 };
 	
 	
-Transform cameraTransform({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,-5.0f });
+Transform cameraTransform({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,-10.0f });
 
 	
 
@@ -1150,6 +1152,8 @@ nullptr;
 
 	ID3D12Resource* vertexResourceSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
 
+
+	const uint32_t kSubdivision = 16;
 D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite
 {
 };
@@ -1159,7 +1163,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite
 
 	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
 
-	ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
+	ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData)*kSubdivision * kSubdivision * 6);
 
 	ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(VertexData));
 
@@ -1167,15 +1171,16 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferView
 {
 };
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
+	vertexBufferView.SizeInBytes = sizeof(VertexData)*kSubdivision * kSubdivision * 6;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-	Vector4* materialData =
-nullptr;
+	Vector4* materialData = nullptr;
+
+	VertexData* vertexData = nullptr;
 
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 
-
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
 	*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	
@@ -1186,16 +1191,68 @@ nullptr;
 	inputFloat4[3] = materialData->w;*/
 
 	
+	
 	// Textureを読んで転送する
-	
-	
 
 	
 
-	
+	float w = 1.0f;
+	const float kLonEvery = std::numbers::pi_v<float> *2.0f / float(kSubdivision);
+	const float kLatEvery = std::numbers::pi_v<float> / float(kSubdivision);
 
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		float lat = -float(M_PI) / 2.0f + kLatEvery * latIndex;
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			float lon = lonIndex * kLonEvery; // 現在の経度
 
-	// metadataを基にSRVの設定
+			uint32_t starIndex = (latIndex * kSubdivision + lonIndex) * 6;
+
+			//a 
+			vertexData[starIndex].position.x = std::cosf(lat) * std::cosf(lon);
+			vertexData[starIndex].position.y = std::sinf(lat);
+			vertexData[starIndex].position.z = std::cosf(lat) * std::sinf(lon);
+			vertexData[starIndex].position.w = w;
+			vertexData[starIndex].texcoord = { float(lonIndex) / float(kSubdivision), 1.0f - float(latIndex) / float(kSubdivision) };
+
+			// b 
+			vertexData[starIndex + 1].position.x = std::cosf(lat + kLatEvery) * std::cosf(lon);
+			vertexData[starIndex + 1].position.y = std::sinf(lat + kLatEvery);
+			vertexData[starIndex + 1].position.z = std::cosf(lat + kLatEvery) * std::sinf(lon);
+			vertexData[starIndex + 1].position.w = w;
+			vertexData[starIndex + 1].texcoord = { float(lonIndex) / float(kSubdivision), 1.0f - float(latIndex + 1) / float(kSubdivision) };
+
+			// c 
+			vertexData[starIndex + 2].position.x = std::cosf(lat) * std::cosf(lon + kLonEvery);
+			vertexData[starIndex + 2].position.y = std::sinf(lat);
+			vertexData[starIndex + 2].position.z = std::cosf(lat) * std::sinf(lon + kLonEvery);
+			vertexData[starIndex + 2].position.w = w;
+			vertexData[starIndex + 2].texcoord = { float(lonIndex + 1) / float(kSubdivision), 1.0f - float(latIndex) / float(kSubdivision) };
+
+			// d 
+			vertexData[starIndex + 3].position.x = std::cosf(lat + kLatEvery) * std::cosf(lon);
+			vertexData[starIndex + 3].position.y = std::sinf(lat + kLatEvery);
+			vertexData[starIndex + 3].position.z = std::cosf(lat + kLatEvery) * std::sinf(lon);
+			vertexData[starIndex + 3].position.w = w;
+			vertexData[starIndex + 3].texcoord = { float(lonIndex) / float(kSubdivision), 1.0f - float(latIndex + 1) / float(kSubdivision) };
+
+			// b
+			vertexData[starIndex + 4].position.x = std::cosf(lat + kLatEvery) * std::cosf(lon + kLonEvery);
+			vertexData[starIndex + 4].position.y = std::sinf(lat + kLatEvery);
+			vertexData[starIndex + 4].position.z = std::cosf(lat + kLatEvery) * std::sinf(lon + kLonEvery);
+			vertexData[starIndex + 4].position.w = w;
+			vertexData[starIndex + 4].texcoord = { float(lonIndex + 1) / float(kSubdivision), 1.0f - float(latIndex + 1) / float(kSubdivision) };
+
+			//c 　
+			vertexData[starIndex + 5].position.x = std::cosf(lat) * std::cosf(lon + kLonEvery);
+			vertexData[starIndex + 5].position.y = std::sinf(lat);
+			vertexData[starIndex + 5].position.z = std::cosf(lat) * std::sinf(lon + kLonEvery);
+			vertexData[starIndex + 5].position.w = w;
+			vertexData[starIndex + 5].texcoord = { float(lonIndex + 1) / float(kSubdivision), 1.0f - float(latIndex) / float(kSubdivision) };
+
+		}
+	}
+
+	// metadataを基にSRVの設定 
 D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc
 {
 };
@@ -1239,30 +1296,30 @@ Transform transformSprite
 };
 
 	// 頂点リソースを書き込む
-	VertexData* vertexData =
-nullptr;
-	// 書き込むためのアドレスを書き込む
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	vertexData[0].position = { -0.5f,-0.5f,0.0f,1.0f };
-	vertexData[0].texcoord = { 0.0f,1.0f };
+	
 
-	vertexData[1].position = { 0.0f,0.5f,0.0f,1.0f };
-	vertexData[1].texcoord = { 0.5f,0.0f };
-
-	vertexData[2].position = { 0.5f,-0.5f,0.0f,1.0f };
-	vertexData[2].texcoord = { 1.0f,1.0f };
-
-	// 左下
-	vertexData[3].position = { -0.5f,-0.5f,0.5f,1.0f };
-	vertexData[3].texcoord = { 0.0f,1.0f };
-
-	// 上2
-	vertexData[4].position = { 0.0f,0.0f,0.0f,1.0f };
-	vertexData[4].texcoord = { 0.5f,0.0f };
-
-	// 右下2
-	vertexData[5].position = { 0.5f,-0.5f,-0.5f,1.0f };
-	vertexData[5].texcoord = { 1.0f,1.0f };
+//	// 書き込むためのアドレスを書き込む
+	
+//	vertexData[0].position = { -0.5f,-0.5f,0.0f,1.0f };
+//	vertexData[0].texcoord = { 0.0f,1.0f };
+//
+//	vertexData[1].position = { 0.0f,0.5f,0.0f,1.0f };
+//	vertexData[1].texcoord = { 0.5f,0.0f };
+//
+//	vertexData[2].position = { 0.5f,-0.5f,0.0f,1.0f };
+//	vertexData[2].texcoord = { 1.0f,1.0f };
+//
+//	// 左下
+//	vertexData[3].position = { -0.5f,-0.5f,0.5f,1.0f };
+//	vertexData[3].texcoord = { 0.0f,1.0f };
+//
+//	// 上2
+//	vertexData[4].position = { 0.0f,0.0f,0.0f,1.0f };
+//	vertexData[4].texcoord = { 0.5f,0.0f };
+//
+//	// 右下2
+//	vertexData[5].position = { 0.5f,-0.5f,-0.5f,1.0f };
+//	vertexData[5].texcoord = { 1.0f,1.0f };
 
 	// 頂点リソースを書き込む
 	VertexData* vertexDataSprite =
@@ -1425,7 +1482,7 @@ float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f }; // 青っぽい色。RGBAの�
 			
 			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 
-			commandList->DrawInstanced(6, 1, 0, 0);
+			commandList->DrawInstanced(kSubdivision * kSubdivision * 6,1,0,0);
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
 			commandList->DrawInstanced(6, 1, 0, 0);
