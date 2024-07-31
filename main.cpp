@@ -628,7 +628,19 @@ nullptr;
 resource;
 }
 
+D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	handleCPU.ptr += (descriptorSize * index);
+	return handleCPU;
+}
 
+D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	handleGPU.ptr += (descriptorSize * index);
+	return handleGPU;
+}
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -1128,6 +1140,31 @@ depthStencilDesc;
 	graphicsPipelineStateDesc.DSVFormat =
 DXGI_FORMAT_D24_UNORM_S8_UINT;
 
+	const uint32_t descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
+	GetCPUDescriptorHandle(rtvDescriptorHeap, descriptorSizeRTV, 0);
+
+
+	DirectX::ScratchImage mipimage2 = LoadTexture("resources/monsterBall.png");
+	const DirectX::TexMetadata& metadata2 = mipimage2.GetMetadata();
+	ID3D12Resource* textureResource2 = CreateTextureResource(device, metadata2);
+	ID3D12Resource* intermediateResources2 = UploadTextureData(textureResource2, mipimage2, device, commandList);
+
+	//metaDataを基にSRVの設定
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
+	srvDesc2.Format = metadata2.format;
+	srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+	srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
+
+	//SRVを作成するDescriptorHeapの場所を決める
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
+	//SRVの生成
+	device->CreateShaderResourceView(textureResource2, &srvDesc2, textureSrvHandleCPU2);
+
 	DirectX::
 ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
@@ -1183,6 +1220,8 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferView
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
 	*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	bool useMonsterBall = true;
 	
 	/*float inputFloat4[4] = { 0.0f,0.0f,0.0f,0.0f };
 	inputFloat4[0] = materialData->x;
@@ -1383,9 +1422,9 @@ D3D12_RECT scissorRect
 			DispatchMessage(&msg);
 		}
 		else {
-			ImGui_ImplDX12_NewFrame();
+			/*ImGui_ImplDX12_NewFrame();
 			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
+			ImGui::NewFrame();*/
 			
 			
 			// ゲームの処理
@@ -1409,9 +1448,25 @@ Matrix4x4 worldViewProjectMatrixSprite = Multiply(worldMatrixSprite, Multiply(vi
 			*transformationMatrixDataSprite =
 worldViewProjectMatrixSprite;
 
-			ImGui::ShowDemoWindow();
+			//ImGui::ShowDemoWindow();
 
+			ImGui_ImplDX12_NewFrame();
+			ImGui_ImplWin32_NewFrame();
+			ImGui::NewFrame();
+			ImGui::Begin("Color");
+			ImGui::ColorEdit4("Text Color With Flags", &materialData->x, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar);
+			ImGui::End();
 
+			// ImGuiウィンドウの作成
+			ImGui::Begin("Ball Controls");
+			ImGui::SliderFloat3("Position", &transform.translate.x, -5.0f, 5.0f);
+			ImGui::SliderFloat3("Rotation", &transform.rotate.x, -180.0f, 180.0f);
+			ImGui::SliderFloat3("Scale", &transform.scale.x, 0.1f, 2.0f);
+			ImGui::SliderFloat("MonsterBallsc", &w, 0.1f, 2.0f);
+			ImGui::Checkbox("useMonsterball", &useMonsterBall);
+			ImGui::End();
+
+			ImGui::Render();
 
 			/*ImGui::Begin("Change color");
 			ImGui::InputFloat4("RGB", inputFloat4);
@@ -1422,7 +1477,7 @@ worldViewProjectMatrixSprite;
 			materialData->z = inputFloat4[2];
 			materialData->w = inputFloat4[3];*/
 			
-			ImGui::Render();
+			
 
 
 
@@ -1479,10 +1534,16 @@ float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f }; // 青っぽい色。RGBAの�
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-			
+
 			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
+
+			commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+			
+			
 
 			commandList->DrawInstanced(kSubdivision * kSubdivision * 6,1,0,0);
+			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
 			commandList->DrawInstanced(6, 1, 0, 0);
@@ -1575,9 +1636,11 @@ D3D12_RESOURCE_STATE_PRESENT;
 	//val->Release();
 	materialResource->Release();
 	wvpResource->Release();
-
+	
 	textureResource->Release();
+	textureResource2->Release();
 	intermediateResource->Release();
+	
 	depthStencilResource->Release();
 	dsvDescriptorHeap->Release();
 	vertexResourceSprite->Release();
