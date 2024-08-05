@@ -1,21 +1,43 @@
 #include "object3d.hlsli"
+
 struct Material
 {
     float32_t4 color;
+    int32_t enableLightng;
+};
+
+struct PixcelShaderOutput
+{
+    float32_t4 color : SV_Target0;
+};
+
+struct DirectrionaLight
+{
+    float32_t4 color; //!< ライトの色
+    float32_t3 direction; //!< ライトの向き
+    float intensity;
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
 Texture2D<float32_t4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
-struct PixelShaderOutput
-{
-    float32_t4 color : SV_Target0;
-};
+ConstantBuffer<DirectrionaLight> gDirectrionaLight : register(b1);
 
-PixelShaderOutput main(VertexShaderOutput input)
+PixcelShaderOutput main(VertexShaderOutput input)
 {
-    PixelShaderOutput output;
+    PixcelShaderOutput output;
     float32_t4 textureColor = gTexture.Sample(gSampler, input.texcoord);
-    output.color = gMaterial.color * textureColor;
+    
+    if (gMaterial.enableLightng != 0)//Litingする場合
+    {
+        float cos = saturate(dot(normalize(input.normal), -gDirectrionaLight.direction));
+        output.color = gMaterial.color * textureColor * gDirectrionaLight.color * cos * gDirectrionaLight.intensity;
+    }
+    else
+    {
+        output.color = gMaterial.color * textureColor;
+    }
+    
+    
     return output;
 }
