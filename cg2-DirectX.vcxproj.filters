@@ -72,6 +72,9 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>ソース ファイル\ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -80,5 +83,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Object3d.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="cg2-DirectX.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
