@@ -65,6 +65,7 @@ struct VertexData {
 struct Material {
 	Vector4 color;
 	int32_t enableLighting;
+
 };
 
 struct TransformationMatrix {
