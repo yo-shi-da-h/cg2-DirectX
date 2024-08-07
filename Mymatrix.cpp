@@ -281,23 +281,7 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 	return result;
 }
 
-//Matrix4x4 MakePerspectiveMatrix(const float& fovY, const float& aspectRatio, const float& nearClip, const float& farClip)
-//{
-//	Matrix4x4 result = { 0 };
-//	float cot = 1.0f / tanf(fovY / 2.0f);
-//
-//	result.m[0][0] = cot / aspectRatio;
-//
-//	result.m[1][1] = cot;
-//
-//	result.m[2][2] = (farClip + nearClip) / (nearClip - farClip);
-//
-//	result.m[2][3] = 1.0f;
-//
-//	result.m[3][2] = (farClip * nearClip) / (nearClip - farClip);
-//
-//	return result;
-//}
+
 
 Matrix4x4 MakePerspectiveFovMatrix(const float fovY, const float aspectRatio, const float nearClip, const float farClip)
 {
