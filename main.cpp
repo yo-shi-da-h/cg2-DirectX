@@ -39,7 +39,7 @@ struct Vector4
 	float w;
 };
 
-Vector3 changeVec3(Vector4 a)
+Vector3 ChangeVector3(Vector4 a)
 {
 	Vector3 result;
 	result.x = a.x;
@@ -65,6 +65,8 @@ struct VertexData {
 struct Material {
 	Vector4 color;
 	int32_t enableLighting;
+	float padding[3];
+	Matrix4x4 uvTransform;
 };
 
 struct TransformationMatrix {
@@ -227,7 +229,7 @@ ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes)
 
 }
 
-ID3D12DescriptorHeap* createDescriptorHeap(
+ID3D12DescriptorHeap* CreateDescriptorHeap(
 	ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
 {
 	ID3D12DescriptorHeap* descriptorHeap = nullptr;
@@ -274,16 +276,16 @@ ID3D12Resource* CreateTextureResouce(ID3D12Device* device, const DirectX::TexMet
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;//プロセッサの近くに配置
 
 	//Resourceの生成
-	ID3D12Resource* resource = nullptr;
+	ID3D12Resource* resouce = nullptr;
 	HRESULT hr = device->CreateCommittedResource(
 		&heapProperties,//Heapの設定
 		D3D12_HEAP_FLAG_NONE,//Heapの特殊な設定
 		&resourceDesc,//Resourceの設定
 		D3D12_RESOURCE_STATE_GENERIC_READ,//作成するResourceのポインタへのポインタ
 		nullptr,//Clearの最高値。使わないのでnullptr
-		IID_PPV_ARGS(&resource));
+		IID_PPV_ARGS(&resouce));
 	assert(SUCCEEDED(hr));
-	return resource;
+	return resouce;
 }
 
 void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages)
@@ -307,7 +309,7 @@ void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mip
 	}
 }
 
-ID3D12Resource* CreateDepthTextureResource(ID3D12Device* device, int32_t width, int32_t height)
+ID3D12Resource* createDepthTextureResource(ID3D12Device* device, int32_t width, int32_t height)
 {
 	// 生成するResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
@@ -403,12 +405,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	);
 
 #ifdef _DEBUG
-	ID3D12Debug1* debugController = nullptr;
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
+	ID3D12Debug1* debugContoroller = nullptr;
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugContoroller)))) {
 		//デバッグプレイヤーを有効化する
-		debugController->EnableDebugLayer();
+		debugContoroller->EnableDebugLayer();
 		//さらにGPU側でもチェックを行うようにする
-		debugController->SetEnableGPUBasedValidation(TRUE);
+		debugContoroller->SetEnableGPUBasedValidation(TRUE);
 	}
 #endif // _DEBUG
 
@@ -448,15 +450,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	ID3D12Device* device = nullptr;
 	//昨日レベルとログ出力用の文字列
-	D3D_FEATURE_LEVEL featureLevels[] = {
+	D3D_FEATURE_LEVEL fealtureLevels[] = {
 		D3D_FEATURE_LEVEL_12_2, D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0
 	};
 	const char* featureLevelString[] = { "12.2", "12.1" , "12.0" };
 	//高い順に生成できるか試していく
-	for (size_t i = 0; i < _countof(featureLevels); ++i)
+	for (size_t i = 0; i < _countof(fealtureLevels); ++i)
 	{
 		//採用したアダプターでデバイスを生成
-		hr = D3D12CreateDevice(UseAdapter, featureLevels[i], IID_PPV_ARGS(&device));
+		hr = D3D12CreateDevice(UseAdapter, fealtureLevels[i], IID_PPV_ARGS(&device));
 		//指定した機能レベルでデバイス生成
 		if (SUCCEEDED(hr)) {
 			//生成できたのでログ出力を行ってループを抜ける
@@ -535,14 +537,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//=======================
 	//depthStencilTextureをウィンドウサイズで作成
-	ID3D12Resource* depthStencilResouce = CreateDepthTextureResource(device, kClientWidth, kClientHeight);
+	ID3D12Resource* depthStencilResouce = createDepthTextureResource(device, kClientWidth, kClientHeight);
 	//=======================
 
 	//ディスクリプターヒープの生成
-	ID3D12DescriptorHeap* rtvDescriptorHeap = createDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
-	ID3D12DescriptorHeap* srvDescriptorHeap = createDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	ID3D12DescriptorHeap* srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
-	ID3D12DescriptorHeap* dsvDescriptorHeap = createDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
 	//SwapChainから Resourceを引っ張ってくる
 	ID3D12Resource* swapChainResources[2] = { nullptr };
@@ -603,7 +605,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//比較関数はLessEqual,つまり近ければ描画がされます
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
-	//現時点でIncudeはしないが、Includeに対応するための設定を作っておく
+	//現時点でIncludeはしないが、Includeに対応するための設定を作っておく
 	IDxcIncludeHandler* includeHandler = nullptr;
 	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
 	assert(SUCCEEDED(hr));
@@ -615,8 +617,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offiserを自動計算
 
 	//RootSignatureの生成
-	D3D12_ROOT_SIGNATURE_DESC descripionRootSignature{};
-	descripionRootSignature.Flags =
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 
@@ -633,10 +635,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;//Tableの中身を配列を指定
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//Tableの中身を配列を指定
 	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixcelShaderで使う
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	rootParameters[3].Descriptor.ShaderRegister = 1;//レジスタ番号１
-	descripionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
-	descripionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
+	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
+	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
 
 	//=================
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
@@ -645,17 +647,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;//比較しない
-	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;//ありったけのMinmapを使う
+	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;//ありったけのMinMapを使う
 	staticSamplers[0].ShaderRegister = 0;//レジスタ番号0を使う
-	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixcelShaderで使う
-	descripionRootSignature.pStaticSamplers = staticSamplers;
-	descripionRootSignature.NumStaticSamplers = _countof(staticSamplers);
+	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
+	descriptionRootSignature.pStaticSamplers = staticSamplers;
+	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 	//=================
 
 	//シリアライズしてバイナリにする
 	ID3DBlob* signatureBlod = nullptr;
 	ID3DBlob* errorBlod = nullptr;
-	hr = D3D12SerializeRootSignature(&descripionRootSignature,
+	hr = D3D12SerializeRootSignature(&descriptionRootSignature,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlod, &errorBlod);
 	if (FAILED(hr)) {
 		Log(reinterpret_cast<char*>(errorBlod->GetBufferPointer()));
@@ -741,7 +743,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ID3D12Resource* indexResource = CreateBufferResource(device, sizeof(uint32_t) * vertexCount);
 
 	//マテリアル用のリソースを作る。今回はColor1つ分のサイズを用意する
-	ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(VertexData));
+	ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(Material));
 	//マテリアルにデータを書き込む
 	Material* materialDate = nullptr;
 	//書き込むためのアドレスを取得
@@ -786,7 +788,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	const float kShitaEvery = float(M_PI) / float(kSubdivision);
 	// 緯度の方向に分割
 	for (int latIndex = 0; latIndex < kSubdivision; ++latIndex) {
-		float shita = float( - M_PI) / 2.0f + kShitaEvery * latIndex;//θ
+		float shita = float(-M_PI) / 2.0f + kShitaEvery * latIndex;//θ
 
 		// 経度の方向に分割しながら線を描く
 		for (int lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
@@ -811,7 +813,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					v
 				}
 			};
-			vLB.normal = changeVec3(vLB.position);
+			vLB.normal = ChangeVector3(vLB.position);
 
 			VertexData vLT = {
 				{
@@ -825,7 +827,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					v - 1.0f / float(kSubdivision)
 				}
 			};
-			vLT.normal = changeVec3(vLT.position);
+			vLT.normal = ChangeVector3(vLT.position);
 
 			VertexData vRB = {
 				{
@@ -839,7 +841,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					v
 				}
 			};
-			vRB.normal = changeVec3(vRB.position);
+			vRB.normal = ChangeVector3(vRB.position);
 
 			VertexData vRT = {
 				{
@@ -853,7 +855,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					v - 1.0f / float(kSubdivision)
 				}
 			};
-			vRT.normal = changeVec3(vRT.position);
+			vRT.normal = ChangeVector3(vRT.position);
 
 			// 原点aにデータを入力する
 			vertexData[start] = vRT;
@@ -876,8 +878,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	ID3D12Resource* vertexResourceSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
 	ID3D12Resource* indexResourceSprite = CreateBufferResource(device, sizeof(uint32_t) * 6);
-	
-
 
 	ID3D12Resource* materialResourceSprite = CreateBufferResource(device, sizeof(Material));
 	Material* materialDateSprite = nullptr;
@@ -1010,12 +1010,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//Sprite用のTransformMatrix用のリソースを作る。
 	ID3D12Resource* transformationMatrixResourceSprite = CreateBufferResource(device, sizeof(TransformationMatrix));
 	//データを書き込む
-	TransformationMatrix* transfromationMatrixDataSprite = nullptr;
+	TransformationMatrix* transformationMatrixDataSprite = nullptr;
 	//書き込むためのアドレスを取得
-	transformationMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transfromationMatrixDataSprite));
+	transformationMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
 	//単位行列を書き込んでおく
-	transfromationMatrixDataSprite->WVP = MakeIdentity4x4();
-	transfromationMatrixDataSprite->World = MakeIdentity4x4();
+	transformationMatrixDataSprite->WVP = MakeIdentity4x4();
+	transformationMatrixDataSprite->World = MakeIdentity4x4();
 
 
 	//ビューポート
@@ -1039,6 +1039,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Transform transform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
 	Transform cameraTransform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 10.0f} };
 	Transform transformSprite{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
+
+	Transform uvTransformSprite{
+		{1.0f, 1.0f, 1.0f},
+		{0.0f, 0.0f, 0.0f},
+		{0.0f, 0.0f, 0.0f},
+	};
+
+	materialDate->uvTransform = MakeIdentity4x4();
+	materialDateSprite->uvTransform = MakeIdentity4x4();
 
 	float TransformUi[3][3];
 
@@ -1123,6 +1132,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::DragFloat3("LightDirection", LightDirection, 0.01f, 1.0f);
 			ImGui::DragFloat("LightIntensity", &LightIntensity, 0.01f, 1.0f);
 
+			ImGui::DragFloat2("uvTransform", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("uvScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+			ImGui::SliderAngle("uvRotate", &uvTransformSprite.rotate.z);
+
 
 			transformSprite.scale.x = TransformUi[0][0];
 			transformSprite.scale.y = TransformUi[0][1];
@@ -1160,8 +1173,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
 			Matrix4x4 projectionMatrixSprite = MakeOrthogphicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.1f, 100.0f);
 			Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
-			transfromationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
-			transfromationMatrixDataSprite->World = worldMatrixSprite;
+			transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
+			transformationMatrixDataSprite->World = worldMatrixSprite;
+
+			Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
+			uvTransformMatrix = Multiply(uvTransformMatrix, MakeRoatateZMatix(uvTransformSprite.rotate.z));
+			uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
+			materialDateSprite->uvTransform = uvTransformMatrix;
 
 			//ImGuiの内部コマンドを生成する
 			ImGui::Render();
@@ -1322,7 +1340,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	textureResource2->Release();
 
 #ifdef _DEBUG
-	debugController->Release();
+	debugContoroller->Release();
 #endif
 	CloseWindow(hwnd);
 
