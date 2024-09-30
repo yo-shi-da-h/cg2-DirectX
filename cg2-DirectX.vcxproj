@@ -107,18 +107,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Object3d.PS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Object3d.vs.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -138,10 +126,20 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Object3d.hlsli" />
+    <ResourceCompile Include="cg2-DirectX.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="cg2-DirectX.rc" />
+    <None Include="resources\shaders\Object3d.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Object3d.vs.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
