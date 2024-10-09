@@ -17,7 +17,11 @@
 #include <corecrt_math_defines.h>
 #include <fstream>
 #include <sstream>
+#include"Input.h"
 
+
+
+#pragma comment(lib, "dinput8.lib")
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
@@ -1775,10 +1779,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent != nullptr);
+	//ポインタ
+	Input* input = nullptr;
+	//入力の初期化
+	input = new Input();
+	input->Initialize(wc.hInstance, hwnd);;
+	//入力の更新
+	input->Update();
+	if (input->PushKey(DIK_0)&&input->Triggerkey(DIK_0)==0) {
+		OutputDebugStringA("Hit 0\n");
+		
+	}
+	//入力解放
+	delete input;
 
-
-
-
+	
 
 	MSG msg{};
 	//ウィンドウの×ボタンが押されるまでループ
