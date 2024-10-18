@@ -6,7 +6,7 @@ struct TransformationMatrix
     float32_t4x4 World;
 };
 ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b0);
-//StructuredBuffer<TransformationMatrix> gTransfoemationMarix : register(t0);
+
 
 struct VertexShederInput
 {
