@@ -2001,7 +2001,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				instancingData[index].World = worldMatrix;
 			}
 
-			commandList->SetGraphicsRootDescriptorTable(2,instancingSrvHandleGPU);
+			commandList->SetGraphicsRootDescriptorTable(1,instancingSrvHandleGPU);
 			commandList->DrawInstanced(UINT(modelData.vertices.size()),kNumInstance,0,0);
 
 
@@ -2208,7 +2208,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	depthStencilResource2->Release();
 	dsvDescriptorHeap2->Release();
 
-
+	instancingResource->Release();
 
 	CloseWindow(hwnd);
 
