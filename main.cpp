@@ -1,5 +1,4 @@
 #include <Windows.h>
-#include <cstdint>
 #include <string>
 #include <format>
 #include <d3d12.h>
@@ -17,7 +16,7 @@
 #include <corecrt_math_defines.h>
 #include <fstream>
 #include <sstream>
-#include"Input.h"
+#include "WinApp.h"
 
 
 
@@ -1011,54 +1010,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg,
 //Windowsアプリのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
-	CoInitializeEx(0, COINIT_MULTITHREADED);
+	//CoInitializeEx(0, COINIT_MULTITHREADED);
 
 
 #pragma region Windouの生成
-	WNDCLASS wc{};
+	WinApp* winApp = nullptr;
 
-	//ウィンドウプロシージャ
-	wc.lpfnWndProc = WindowProc;
-	//ウィンドウクラス名
-	wc.lpszClassName = L"C62WindowClass";
-	//インスタンスハンドル
-	wc.hInstance = GetModuleHandle(nullptr);
-	//カーソル
-	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-
-	//ウィンドウクラスの登録
-	RegisterClass(&wc);
-
-	//クライアント領域のサイズ　横　縦
-	const int32_t kClientWidth = 1280;
-	const int32_t kClientHeight = 720;
-	//　ウィンドウサイズを表す構造体にクライアント領域を入れる
-	RECT wrc = { 0, 0,kClientWidth,kClientHeight };
-
-
-	//クライアント領域をもとに実際のサイズにwrcを変更してもらう
-	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-
-	HWND hwnd = CreateWindow(
-		wc.lpszClassName,
-		L"CG2",
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		wrc.right - wrc.left,
-		wrc.bottom - wrc.top,
-		nullptr,
-		nullptr,
-		wc.hInstance,
-		nullptr);
-
-	Input* input = nullptr;
-	input = new Input();
-	input->Initialize(wc.hInstance, hwnd);
-
-
-	ShowWindow(hwnd, SW_SHOW);
+	winApp = new WinApp();
+	winApp->Initialize();
 
 #pragma endregion
 
@@ -1799,12 +1758,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		else {
 
-	        //入力の更新
-	        input->Update();
-	        if (input->Triggerkey(DIK_SPACE)) {
-	        	OutputDebugStringA("Hit 0\n");
-	        	
-	        }
+	       
 			//ゲームの処理
 
 			ImGui_ImplDX12_NewFrame();
@@ -2086,7 +2040,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	//入力解放
-	delete input;
+	delete winApp;
 
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
