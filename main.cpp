@@ -1739,7 +1739,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		else {
 			Input* input = nullptr;
 	        input = new Input();
-	        input->Initialize(winApp->GetHInstance(), winApp->GetHwnd());
+	        input->Initialize(winApp);
 	       
 			//ゲームの処理
 
