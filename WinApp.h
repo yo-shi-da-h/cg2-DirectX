@@ -1,16 +1,27 @@
 #pragma once
 #include <cstdint>
 #include "Windows.h"
+#include "Input.h"
 class WinApp
 {
 public:
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	//クライアント領域のサイズ　横　縦
+	static const int32_t kClientWidth = 1280;
+	static const int32_t kClientHeight = 720;
 
-public:
+    HWND hwnd = nullptr;
+
+	HWND GetHwnd() const {return hwnd; }
+
+	HINSTANCE GetHInstance() const {return wc.hInstance;}
 
 	void Initialize();
 
 	void Update();
+
+private:
+	WNDCLASS wc{};
 
 };
 
