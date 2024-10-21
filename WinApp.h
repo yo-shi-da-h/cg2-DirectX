@@ -4,7 +4,7 @@
 class WinApp
 {
 public:
-	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT mag, WPARAM wparam, LPARAM lparam);
+	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 public:
 
