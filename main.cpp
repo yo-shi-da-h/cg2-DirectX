@@ -2064,7 +2064,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			commandList->SetGraphicsRootConstantBufferView(0, materialResourceSphere->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
 
 			//commandList->SetGraphicsRootConstantBufferView(1, wvpResourceSphere->GetGPUVirtualAddress());
-			commandList->SetGraphicsRootDescriptorTable(0,instancingSrvHandleGPU);
+			commandList->SetGraphicsRootDescriptorTable(1,instancingSrvHandleGPU);
 			commandList->DrawInstanced(UINT(modelData.vertices.size()),kNumInstance,0,0);
 
 			if (textureChange == 0) {
