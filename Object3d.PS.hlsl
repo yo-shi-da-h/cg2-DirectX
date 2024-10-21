@@ -30,24 +30,19 @@ PixcelShaderOutput main(VertexShaderOutput input)
     
     float4 transformedUV = mul(float32_t4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float32_t4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
-    output.color = gMaterial.color * textureColor;
+    //output.color = gMaterial.color * textureColor;
     
-    if (output.color.a == 0.0)
+    if (gMaterial.enableLightng != 0)//Litingする場合
     {
-        discard;
+        float NdotL = dot(normalize(input.normal), -gDirectrionaLight.direction);
+        float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+        output.color.rgb = textureColor.rgb * gDirectrionaLight.color.rgb * cos * gDirectrionaLight.intensity;
+        output.color.rgb = gMaterial.color.a * textureColor.a;
     }
-    
-    //if (gMaterial.enableLightng != 0)//Litingする場合
-    //{
-    //    float NdotL = dot(normalize(input.normal), -gDirectrionaLight.direction);
-    //    float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-    //    output.color.rgb = textureColor.rgb * gDirectrionaLight.color.rgb * cos * gDirectrionaLight.intensity;
-    //    output.color.rgb = gMaterial.color.a * textureColor.a;
-    //}
-    //else
-    //{
-    //    output.color = gMaterial.color * textureColor;
-    //}
+    else
+    {
+        output.color = gMaterial.color * textureColor;
+    }
     
     
     return output;
