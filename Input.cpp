@@ -22,19 +22,21 @@ void Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 
 void Input::Update()
 {
+	
+	memcpy(keyPre,key, sizeof(key));
 	keyboard->Acquire();
 
 	keyboard->GetDeviceState(sizeof(key),key);
 
 	
 
-	memcpy(keyPre,key, sizeof(key));
+	
 }
 
 bool Input::PushKey(BYTE keyNumber)
 {
 	if (key[keyNumber]) {
-		OutputDebugStringA("Hit 0\n");
+		
 		return true;
 	}
 	return false;
@@ -42,7 +44,7 @@ bool Input::PushKey(BYTE keyNumber)
 
 bool Input::Triggerkey(BYTE keyNumber)
 {
-	if (keyPre[keyNumber]==0) {
+	if (keyPre[keyNumber]==0&&key[keyNumber]) {
 		OutputDebugStringA("Hit 0\n");
 		return true;
 	}

@@ -1056,7 +1056,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Input* input = nullptr;
 	input = new Input();
 	input->Initialize(wc.hInstance, hwnd);
-	input->Update();
 
 
 	ShowWindow(hwnd, SW_SHOW);
@@ -1800,12 +1799,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		else {
 
-			//入力の初期化
-	        input = new Input();
-	        input->Initialize(wc.hInstance, hwnd);;
 	        //入力の更新
 	        input->Update();
-	        if (input->PushKey(DIK_0)) {
+	        if (input->Triggerkey(DIK_SPACE)) {
 	        	OutputDebugStringA("Hit 0\n");
 	        	
 	        }
