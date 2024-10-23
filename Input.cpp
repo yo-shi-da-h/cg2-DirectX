@@ -19,7 +19,7 @@ void Input::Initialize(WinApp* winApp)
 	result = keyboard->SetDataFormat(&c_dfDIKeyboard);
 	assert(SUCCEEDED(result));
 
-	result = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	result = keyboard->SetCooperativeLevel(winApp->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(result));
 }
 

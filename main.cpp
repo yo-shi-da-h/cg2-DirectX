@@ -2023,6 +2023,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//入力解放
 	delete winApp;
+	
 
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
