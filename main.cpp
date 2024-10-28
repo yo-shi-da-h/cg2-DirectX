@@ -2065,7 +2065,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			//commandList->SetGraphicsRootConstantBufferView(1, wvpResourceSphere->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(1,instancingSrvHandleGPU);
-			commandList->DrawInstanced(UINT(modelData.vertices.size()),kNumInstance,0,0);
+			//commandList->DrawInstanced(UINT(modelData.vertices.size()),kNumInstance,0,0);
 
 			if (textureChange == 0) {
 				commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
@@ -2078,7 +2078,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 			commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-			commandList->DrawInstanced(UINT(modelData.vertices.size()), 10, 0, 0);
+			commandList->DrawInstanced(UINT(modelData.vertices.size()), kNumInstance, 0, 0);
 
 
 
@@ -2192,8 +2192,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//materialResource->Release();
 	materialResourceSphere->Release();
-
-	materialResourceSprite->Release();
+	
+	//materialResourceSprite->Release();
 
 #ifdef _DEBUG
 	debugController->Release();
