@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
-#include "Windows.h"
-#include "Input.h"
+#include <wrl.h>
+
 class WinApp
 {
 public:
@@ -19,6 +19,10 @@ public:
 	void Initialize();
 
 	void Update();
+
+	void Finalize();
+
+	bool ProcessMessage();
 
 private:
 	WNDCLASS wc{};

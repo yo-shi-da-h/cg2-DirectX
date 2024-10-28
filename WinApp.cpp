@@ -1,7 +1,7 @@
 #include "WinApp.h"
-#include <wrl.h>
-#include "externals/imgui/imgui_impl_win32.cpp"
 
+#include "externals/imgui/imgui.h"
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wPARAm, LPARAM lParam);
 
 
 LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -75,4 +75,31 @@ void WinApp::Initialize()
 
 void WinApp::Update()
 {
+}
+
+void WinApp::Finalize()
+{
+	CloseWindow(hwnd);
+	CoUninitialize();
+}
+
+bool WinApp::ProcessMessage()
+{
+
+	MSG msg{};
+
+	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) 
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	if (msg.message == WM_QUIT) 
+	{
+		return false;
+	}
+
+	return false;
+
+	return false;
 }

@@ -16,15 +16,13 @@
 #include <corecrt_math_defines.h>
 #include <fstream>
 #include <sstream>
-#include "WinApp.h"
-
-
-
-#pragma comment(lib, "dinput8.lib")
+#include "Input.h"
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
-#pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
+
+
+
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -999,6 +997,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	winApp = new WinApp();
 	winApp->Initialize();
 
+	Input* input = nullptr;
+	        input = new Input();
+	        input->Initialize(winApp);
+
 #pragma endregion
 
 #ifdef _DEBUG
@@ -1731,15 +1733,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	MSG msg{};
 	//ウィンドウの×ボタンが押されるまでループ
-	while (msg.message != WM_QUIT) {
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+	while (true) {
+
+		if (winApp->ProcessMessage()) {
+			break;
 		}
 		else {
-			Input* input = nullptr;
-	        input = new Input();
-	        input->Initialize(winApp);
+			input->Update();
+
+			if (input->Triggerkey(DIK_SPACE)) {
+				OutputDebugStringA("Hit 0\n");
+			}
 	       
 			//ゲームの処理
 
@@ -2021,6 +2025,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 	}
 
+	winApp->Finalize();
+
 	//入力解放
 	delete winApp;
 	
@@ -2095,7 +2101,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-	CloseWindow(winApp->GetHwnd());
+	
 
 
 
@@ -2107,8 +2113,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
 		debug->Release();
 	}
-
-	CoUninitialize();
+	
 
 
 	return 0;
