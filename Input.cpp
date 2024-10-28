@@ -1,3 +1,5 @@
+#pragma comment(lib,"dxguid.lib")
+#pragma comment(lib, "dinput8.lib")
 #include "Input.h"
 #include <cassert>
 
