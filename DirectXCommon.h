@@ -15,14 +15,18 @@ public:
 
 	void CommandInitialization();
 
-	void SwapChainInitialization();
+	void SwapChainGenerate();
 
-	void DepthBufferInitialization();
+	void DepthBufferGenerate();
+
+	void DescriptorHeapGenerate();
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
 
 	Microsoft::WRL::ComPtr<IDXGIFactory> dxgiFactory;
+
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT num)
 
 	WinApp* winApp = nullptr;
 };
