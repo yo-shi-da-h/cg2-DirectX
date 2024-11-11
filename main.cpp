@@ -590,6 +590,12 @@ struct DirectionalLight {
 	float intensity;
 };
 
+struct Particle
+{
+	Transform transform;
+	Vector3 velocity;
+};
+
 Vector3 Normalize(const Vector3& v) {
 	Vector3 result;
 	result.x = v.x / (float)sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
