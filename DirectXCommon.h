@@ -26,7 +26,7 @@ private:
 
 	Microsoft::WRL::ComPtr<IDXGIFactory> dxgiFactory;
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT num)
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT num);
 
 	WinApp* winApp = nullptr;
 };
