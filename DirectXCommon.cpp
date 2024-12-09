@@ -15,7 +15,7 @@ using namespace StringUtility;
 
 using namespace Microsoft::WRL;
 
-void DirectXCommon::Initialize()
+void DirectXCommon::Initialize(WinApp* winApp)
 {
 	assert(winApp);
 
@@ -35,9 +35,7 @@ void DirectXCommon::Initialize()
 
 }
 
-void DirectXCommon::Update()
-{
-}
+
 
 void DirectXCommon::DeviceInitialization()
 {
@@ -55,11 +53,12 @@ void DirectXCommon::DeviceInitialization()
 #endif
 
 #pragma region Factoryの生成
-	//DZGIファクトリーの生成
-	IDXGIFactory7* dxgiFactory = nullptr;
+	//DXGIファクトリーの生成
+	/*IDXGIFactory7* dxgiFactory = nullptr;*/
 	//HREUSLTはWindouws系のエラーコード
 	//関数が成功したかどうかをSUCCEEDEDマクロで判定できる
 	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
+	Microsoft::WRL::ComPtr<IDXGIAdapter4> useadapter = nullptr;
 	//初期化の標本的な部分でエラーが出た場合はぷろぐらむがまちがっているか、
 	// どうにもできない場合が多いのでassertにしておく
 	assert(SUCCEEDED(hr));//甲であることを保証　そうでないと止まる
@@ -93,7 +92,7 @@ void DirectXCommon::DeviceInitialization()
 #pragma endregion
 
 #pragma region Deviceの生成
-	ID3D12Device* device = nullptr;
+	//ID3D12Device* device = nullptr;
 
 	D3D_FEATURE_LEVEL featureLevels[] = {
 		D3D_FEATURE_LEVEL_12_2,D3D_FEATURE_LEVEL_12_1,D3D_FEATURE_LEVEL_12_0
@@ -148,55 +147,40 @@ void DirectXCommon::DeviceInitialization()
 void DirectXCommon::CommandInitialization()
 {
 	HRESULT hr;
-	#pragma region コマンドキュー
 
-	//コマンドキュー生成
-	ID3D12CommandQueue* commandQueue = nullptr;
+	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
+	//コマンドアロケータを生成出来ないので起動できない
+	assert(SUCCEEDED(hr));
+
+	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
+	//コマンドリストetc...
+	assert(SUCCEEDED(hr));
+
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
 	hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
-	//生成できない場合
+
+	//コマンドキューが生成できないので起動できない
 	assert(SUCCEEDED(hr));
-
-#pragma endregion
-
-#pragma region コマンドアロケータ
-	//コマンドアロケータ生成
-	ID3D12CommandAllocator* commandAllocator = nullptr;
-	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
-	//生成できない場合
-	assert(SUCCEEDED(hr));
-
-#pragma endregion
-
-#pragma region コマンドリスト
-	//コマンドリスト生成
-	ID3D12GraphicsCommandList* commandList = nullptr;
-	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList));
-	//生成できない場合
-	assert(SUCCEEDED(hr));
-#pragma endregion
 }
 
 void DirectXCommon::SwapChainGenerate()
 {
-	IDXGIFactory4* dxgiFactory = nullptr;
-    HRESULT hr = CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory));
-    assert(SUCCEEDED(hr));
-	ID3D12Device* device = nullptr;
-    D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
+	
+	//ID3D12Device* device = nullptr;
+   /* D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
     commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
     commandQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
     commandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-    commandQueueDesc.NodeMask = 0;
+    commandQueueDesc.NodeMask = 0;*/
     
-    ID3D12CommandQueue* commandQueue = nullptr;
+   /* ID3D12CommandQueue* commandQueue = nullptr;
     hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
-    assert(SUCCEEDED(hr));
-	
+    assert(SUCCEEDED(hr));*/
+	//HRESULT hr;
 	#pragma region Swap Chainの生成
 	//スワップチェイン生成
-	IDXGISwapChain4* swapChain = nullptr;
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+	
+	//DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 	swapChainDesc.Width = WinApp::kClientWidth;
 	swapChainDesc.Height = WinApp::kClientHeight;
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -205,64 +189,18 @@ void DirectXCommon::SwapChainGenerate()
 	swapChainDesc.BufferCount = 2;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
-	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, winApp->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
-	assert(SUCCEEDED(hr));
+	HRESULT hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), winApp->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
+    assert(SUCCEEDED(hr));
+
 
 	//SwapchainからResourceを引っ張ってくる
-	ID3D12Resource* swapChainResource[2] = { nullptr };
-	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResource[0]));
+	//ID3D12Resource* swapChainResource[2] = { nullptr };
+	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResources[0]));
 	assert(SUCCEEDED(hr));
 
-	hr = swapChain->GetBuffer(1, IID_PPV_ARGS(&swapChainResource[1]));
+	hr = swapChain->GetBuffer(1, IID_PPV_ARGS(&swapChainResources[1]));
 	assert(SUCCEEDED(hr));
 #pragma endregion
-}
-
-void DirectXCommon::DescriptorHeapGenerate()
-{
-	#pragma region ディスクリプターヒープの生成
-
-
-
-	ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
-	ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
-	ID3D12DescriptorHeap* srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
-
-
-#pragma endregion
-
-	const uint32_t descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-
-}
-
-void DirectXCommon::RenderTargetViewInitialization()
-{
-	HRESULT hr;
-	//SwapchainからResourceを引っ張ってくる
-	ID3D12Resource* swapChainResource[2] = { nullptr };
-	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResource[0]));
-	assert(SUCCEEDED(hr));
-
-	hr = swapChain->GetBuffer(1, IID_PPV_ARGS(&swapChainResource[1]));
-	assert(SUCCEEDED(hr));
-	//RTV
-	//D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
-
-	rtvHandles[0] = rtvStartHandle;
-	device->CreateRenderTargetView(swapChainResource[0], &rtvDesc, rtvHandles[0]);
-
-	
-	rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-	device->CreateRenderTargetView(swapChainResource[1], &rtvDesc, rtvHandles[1]);
 }
 
 void DirectXCommon::DepthBufferGenerate()
@@ -304,9 +242,67 @@ void DirectXCommon::DepthBufferGenerate()
 	
 }
 
+void DirectXCommon::DescriptorHeapGenerate()
+{
+	#pragma region ディスクリプターヒープの生成
+
+	  // Create descriptor heap here
+    D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+    heapDesc.NumDescriptors = 1;
+    heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
+    HRESULT hr = device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&srvDescriptorHeap));
+    assert(SUCCEEDED(hr));
+    if (FAILED(hr)) {
+        srvDescriptorHeap = nullptr;
+    }
+
+	ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	ID3D12DescriptorHeap* srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+
+
+#pragma endregion
+
+	const uint32_t descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
+}
+
+void DirectXCommon::RenderTargetViewInitialization()
+{
+	if (!rtvDescriptorHeap) {
+        // Handle error: rtvDescriptorHeap is not initialized
+        return;
+    }
+	//RTV
+	
+	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+
+	rtvHandles[0] = rtvStartHandle;
+	device->CreateRenderTargetView(swapChainResources[0].Get(), &rtvDesc, rtvHandles[0]);
+
+	
+	rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+	device->CreateRenderTargetView(swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
+}
+
+
+
 void DirectXCommon::DepthStencilViewInitialization()
 {
-	
+	if (dsvDescriptorHeap == nullptr) {
+    // Handle error, e.g., log it or throw an exception
+    return;
+}
 	//DSV生成
 	D3D12_DEPTH_STENCIL_VIEW_DESC dscDesc{};
 	dscDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;

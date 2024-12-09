@@ -10,17 +10,17 @@ class DirectXCommon
 {
 public:
 	
-	void Initialize();
+	void Initialize(WinApp* winApp);
 
-	void Update();
+	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap,uint32_t descriptorSize , uint32_t index);
 
-	
+	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
 
-private:
+	private:
 
 	void DeviceInitialization();
 
@@ -45,27 +45,36 @@ private:
 	void DXCCompilerGenerate();
 
 	void ImGuiInitialization();
-	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain;
+	
+	 //dxgiFactoryの生成
+	Microsoft::WRL::ComPtr<ID3D12Device> device = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Device> device;
-
-	Microsoft::WRL::ComPtr<IDXGIFactory> dxgiFactory;
+	 //コマンドキュー生成
+    Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue = nullptr;
+    //コマンドアロケータを生成する
+    Microsoft::WRL::ComPtr<ID3D12CommandAllocator>commandAllocator = nullptr;
+    //コマンドリストを生成する
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
 
 	
-    Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap; 
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap;
-    Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource;
+    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr; 
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = nullptr;
 
 	int32_t width;  
     int32_t height;
-	uint32_t descriptorSizeSRV;
-    uint32_t descriptorSizeRTV;
-    uint32_t descriptorSizeDSV;
-
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc; // 追加
-    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc; // 追加
+	uint32_t descriptorSizeSRV = 0;
+    uint32_t descriptorSizeRTV = 0;
+    uint32_t descriptorSizeDSV = 0;;
+	//SwapChain
+    Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = nullptr;
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{}; // 追加
+	//swapchainからリソースを引っ張る
+    std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources;
+   
 
 
 	ID3D12DescriptorHeap* CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDesciptors, bool shaderVisible)
@@ -82,13 +91,15 @@ private:
 
 	return descriptorHeap;
      };
+	
+  
 
-	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources;
+	
+    //D3D12_RESOURCE_DESC depthStencilDesc = {};
+    
 
 	WinApp* winApp = nullptr;
 
-	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap,uint32_t descriptorSize , uint32_t index);
-
-	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index);
+	
 };
 
