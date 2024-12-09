@@ -17,6 +17,8 @@
 
 using namespace StringUtility;
 
+
+
 #pragma comment(lib,"dxcompiler.lib")
 
 
@@ -40,6 +42,7 @@ IDxcBlob* CompileShader(
 {
 	//1.hlslファイル
 	log(ConvertString(std::format(L"Begin CompileShader,path:{},profile:{}\n", filePath, profile)));
+	
 
 	IDxcBlobEncoding* shaderSource = nullptr;
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
