@@ -41,7 +41,7 @@ void DirectXCommon::Update()
 
 void DirectXCommon::DeviceInitialization()
 {
-	HRESULT hr;
+	
 
 	#ifdef _DEBUG
 	ID3D12Debug1* debugController = nullptr;

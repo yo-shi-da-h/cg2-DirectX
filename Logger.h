@@ -2,7 +2,7 @@
 #include <string>
 namespace Logger
 {
-	void Logger::log(const std::string& message);
+	void log(const std::string& message);
 
 };
 
