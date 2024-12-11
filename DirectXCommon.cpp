@@ -379,6 +379,56 @@ void DirectXCommon::ImGuiInitialization()
 		srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 }
 
+void DirectXCommon::PreDraw()
+{
+	//これから書き込みバックバッファのインデックスを取得
+			UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+
+			//TransitionBarrierの設定
+			D3D12_RESOURCE_BARRIER barrier{};
+			//今回のバリアはTransition
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			//Noneにしておく
+			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			//バリアを貼る対象のリソース。現在のバッファに対して行う
+			barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+			//前の(現在の)ResourceState
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+			//後のResourceState
+			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+			//TransitionBarrierを張る
+			commandList->ResourceBarrier(1, &barrier);
+
+
+
+
+			// 描画先のRTVの設定をする
+			commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
+			//指定した色で画面をクリアする　
+			float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
+			//コマンド蓄積
+			commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+
+			//描画用のDescriptorHeap
+			ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get()};
+			commandList->SetDescriptorHeaps(1, descriptorHeaps);
+
+			//DSV
+			D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+			commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+
+
+
+			commandList->RSSetViewports(1, &viewport);
+			commandList->RSSetScissorRects(1, &scissorRect);
+}
+
+void DirectXCommon::PostDraw()
+{
+
+}
+
 D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVCPUDescriptorHandle(uint32_t index)
 {
 	return GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV,index);

@@ -45,6 +45,10 @@ public:
 	void DXCCompilerGenerate();
 
 	void ImGuiInitialization();
+
+	void PreDraw();
+
+	void PostDraw();
 	
 	 //dxgiFactoryの生成
 	Microsoft::WRL::ComPtr<ID3D12Device> device = nullptr;
