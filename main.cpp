@@ -1437,7 +1437,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			break;
 		}
 		else {
-			//input->Update();
+			input->Update();
+
+			  // 描画前処理
+            dxCommon->PreDraw();
+
+			// 描画後処理
+            dxCommon->PostDraw();
 
 			//if (input->Triggerkey(DIK_SPACE)) {
 			//	OutputDebugStringA("Hit 0\n");
@@ -1666,11 +1672,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//入力解放
 	delete winApp;
 	delete dxCommon;
-	
+	delete input;
 
-	ImGui_ImplDX12_Shutdown();
+	/*ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+	ImGui::DestroyContext();*/
 
 
 //	CloseHandle(fenceEvent);

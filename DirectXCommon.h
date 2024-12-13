@@ -21,6 +21,10 @@ public:
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
 
+	void PreDraw();
+
+	void PostDraw();
+
 	private:
 
 	void DeviceInitialization();
@@ -47,9 +51,7 @@ public:
 
 	void ImGuiInitialization();
 
-	void PreDraw();
-
-	void PostDraw();
+	
 	
 	 //dxgiFactoryの生成
 	Microsoft::WRL::ComPtr<ID3D12Device> device = nullptr;
@@ -73,6 +75,8 @@ public:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = nullptr;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = nullptr;
+
+
 
 	int32_t width;  
     int32_t height;
@@ -101,20 +105,8 @@ public:
    
 
 
-	ID3D12DescriptorHeap* CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDesciptors, bool shaderVisible)
-{
-	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc{};
-	descHeapDesc.NumDescriptors = numDesciptors;
-	descHeapDesc.Type = heapType;
-	descHeapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	descHeapDesc.NodeMask = 0;
-
-	ID3D12DescriptorHeap* descriptorHeap = nullptr;
-	HRESULT hr = device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descriptorHeap));
-	assert(SUCCEEDED(hr));
-
-	return descriptorHeap;
-     };
+	ID3D12DescriptorHeap* CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, 
+        D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	
   
 
