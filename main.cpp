@@ -1924,7 +1924,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
 
 
-
+		
 			//ImGuiの内部コマンド
 			ImGui::Render();
 
