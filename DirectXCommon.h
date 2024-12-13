@@ -6,6 +6,7 @@
 #include <array>
 #include <cassert>
 #include <dxgi1_4.h>
+#include <dxcapi.h>
 class DirectXCommon
 {
 public:
@@ -63,6 +64,11 @@ public:
 
 	
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+
+
+
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr; 
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = nullptr;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
@@ -78,6 +84,20 @@ public:
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{}; // 追加
 	//swapchainからリソースを引っ張る
     std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources;
+
+	 //DXCの初期化
+    IDxcUtils* dxcUtils = nullptr;
+    IDxcCompiler3* dxcCompiler = nullptr;
+    //include対応のため設定しておく
+    IDxcIncludeHandler* includeHandler = nullptr;
+
+    //フェンスの生成
+    Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
+    UINT64 fenceValue = 0;
+    HANDLE fenceEvent = nullptr;
+
+    D3D12_VIEWPORT viewport{};
+    D3D12_RECT scissorRect{};
    
 
 

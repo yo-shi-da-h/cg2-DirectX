@@ -278,6 +278,7 @@ void DirectXCommon::RenderTargetViewInitialization()
         return;
     }
 	//RTV
+
 	
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
@@ -299,10 +300,12 @@ void DirectXCommon::RenderTargetViewInitialization()
 
 void DirectXCommon::DepthStencilViewInitialization()
 {
-	if (dsvDescriptorHeap == nullptr) {
-    // Handle error, e.g., log it or throw an exception
-    return;
-}
+	if(!dsvDescriptorHeap){
+		// Handle error: dsvDescriptorHeap is not initialized
+		return;
+	}	
+
+
 	//DSV生成
 	D3D12_DEPTH_STENCIL_VIEW_DESC dscDesc{};
 	dscDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -426,7 +429,71 @@ void DirectXCommon::PreDraw()
 
 void DirectXCommon::PostDraw()
 {
+	////ImGuiの内部コマンド
+	ImGui::Render();
 
+	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+	//TransitionBarrierの設定
+	D3D12_RESOURCE_BARRIER barrier{};
+	//今回のバリアはTransition
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	//Noneにしておく
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	//バリアを貼る対象のリソース。現在のバッファに対して行う
+	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	//前の(現在の)ResourceState
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	//後のResourceState
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//TransitionBarrierを張る
+	commandList->ResourceBarrier(1, &barrier);
+
+	HRESULT hr = commandList->Close();
+	assert(SUCCEEDED(hr));
+
+	//GPUにコマンドリストの実行を行わせる
+	ID3D12CommandList* commandLists[] = { commandList.Get()};
+	commandQueue->ExecuteCommandLists(1, commandLists);
+
+	//GPUとOSに画面の交換を行うように通知する
+	swapChain->Present(1, 0);
+
+	//FENCEを更新する
+	fenceValue++;
+
+	commandQueue->Signal(fence.Get(), fenceValue);
+
+	if (fence->GetCompletedValue() < fenceValue) {
+
+		fence->SetEventOnCompletion(fenceValue, fenceEvent);
+
+		WaitForSingleObject(fenceEvent, INFINITE);
+
+	}
+
+
+	//次のフレームのコマンドリストを準備
+	hr = commandAllocator->Reset();
+	assert(SUCCEEDED(hr));
+	hr = commandList->Reset(commandAllocator.Get(), nullptr);
+	assert(SUCCEEDED(hr));
+
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	handleCPU.ptr += (descriptorSize * index);
+	return handleCPU;
+	
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	handleGPU.ptr += (descriptorSize * index);
+	return handleGPU;
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVCPUDescriptorHandle(uint32_t index)
@@ -440,15 +507,6 @@ D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVGPUDescriptorHandle(uint32_t in
 }
 
 
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index)
-{
-	return D3D12_CPU_DESCRIPTOR_HANDLE();
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index)
-{
-	return D3D12_GPU_DESCRIPTOR_HANDLE();
-}
 
 
 

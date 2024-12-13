@@ -1564,8 +1564,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-			////ImGuiの内部コマンド
-			//ImGui::Render();
+			
 
 
 			
@@ -1652,33 +1651,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//assert(SUCCEEDED(hr));
 
 
-			////GPUにコマンドリストの実行を行わせる
-			//ID3D12CommandList* commandLists[] = { commandList };
-			//commandQueue->ExecuteCommandLists(1, commandLists);
-			////GPUとOSに画面の交換を行うように通知する
-			//swapChain->Present(1, 0);
+			
+			
 
 			////// 出力ウィンドウへの文字出力
 			////OutputDebugStringA("Hello DirectX!\n");
-			////FENCEを更新する
-			//fenceValue++;
-
-			//commandQueue->Signal(fence, fenceValue);
-
-			//if (fence->GetCompletedValue() < fenceValue) {
-
-			//	fence->SetEventOnCompletion(fenceValue, fenceEvent);
-
-			//	WaitForSingleObject(fenceEvent, INFINITE);
-
-			//}
-
-
-			////次のフレームのコマンドリストを準備
-			//hr = commandAllocator->Reset();
-			//assert(SUCCEEDED(hr));
-			//hr = commandList->Reset(commandAllocator, nullptr);
-			//assert(SUCCEEDED(hr));
+			
 
 		}
 	}
