@@ -21,32 +21,32 @@ void DirectXCommon::Initialize(WinApp* winApp) {
 	this->winApp_ = winApp;
 
 	// デバイスの生成
-	CreateDevice();
+	DeviceInitialization();
 	// コマンド関連の初期化
-	InitializeCommandObjects();
+	CommandInitialization();
 	// スワップチェーンの生成
-	CreateSwapChain();
+	SwapChainGenerate();
 	// 深度バッファの生成
-	CreateDepthBuffer();
+	DepthBufferGenerate();
 	// 各種デスクリプタヒープの生成
-	CreateDescriptorHeaps();
+	 DescriptorHeapGenerate();
 	// レンダーターゲットビューの初期化
-	InitializeRenderTargetView();
+	RenderTargetViewInitialization();
 	// 深度ステンシルビューの初期化
-	InitializeDepthStencilView();
+	DepthStencilViewInitialization();
 	// フェンスの初期化
-	InitializeFence();
+	FenceInitialization();
 	// ビューポート矩形の初期化
-	InitializeViewportAndScissorRect();
+	ViewportRectangleInitialization();
 	//シザリング矩形の初期化
-	InitializeScissorRect();
+	ScissorRectangleInitialization();
 	// DXCコンパイラの生成
-	CreateDXCCompiler();
+	DXCCompilerGenerate();
 	// ImGuiの初期化
-	InitializeImGui();
+	ImGuiInitialization();
 }
 
-void DirectXCommon::CreateDevice()
+void DirectXCommon::DeviceInitialization()
 {
 #ifdef _DEBUG
 
@@ -151,7 +151,7 @@ void DirectXCommon::CreateDevice()
 #endif // _DEBUG
 }
 
-void DirectXCommon::InitializeCommandObjects()
+void DirectXCommon::CommandInitialization()
 {
 	HRESULT hr;
 
@@ -170,7 +170,7 @@ void DirectXCommon::InitializeCommandObjects()
 	assert(SUCCEEDED(hr));
 }
 
-void DirectXCommon::CreateSwapChain()
+void DirectXCommon::SwapChainGenerate()
 {
 	HRESULT hr;
 
@@ -193,7 +193,7 @@ void DirectXCommon::CreateSwapChain()
 	assert(SUCCEEDED(hr));
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource>DirectXCommon::CreateDepthBuffer()
+Microsoft::WRL::ComPtr<ID3D12Resource>DirectXCommon::DepthBufferGenerate()
 {
 	D3D12_RESOURCE_DESC resorceDesc{};
 	resorceDesc.Width = winApp_->kClientWidth;
@@ -226,7 +226,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource>DirectXCommon::CreateDepthBuffer()
 }
 
 
-void DirectXCommon::CreateDescriptorHeaps()
+void DirectXCommon:: DescriptorHeapGenerate()
 {
 	descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -237,7 +237,7 @@ void DirectXCommon::CreateDescriptorHeaps()
 	dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 }
 
-void DirectXCommon::InitializeRenderTargetView()
+void DirectXCommon::RenderTargetViewInitialization()
 {
 	//RTVの設定
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -254,19 +254,19 @@ void DirectXCommon::InitializeRenderTargetView()
 	device->CreateRenderTargetView(swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
 }
 
-void DirectXCommon::InitializeDepthStencilView()
+void DirectXCommon::DepthStencilViewInitialization()
 {
 	//DSVの設定
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//Format.基本的にはResourceに合わせる
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2dTexture
 
 	//DSVHeapの先頭にDSVをつくる
-	depthStencilResource = CreateDepthBuffer();
+	depthStencilResource = DepthBufferGenerate();
 	device->CreateDepthStencilView(depthStencilResource.Get(), &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 }
 
-void DirectXCommon::InitializeFence()
+void DirectXCommon::FenceInitialization()
 {
 	HRESULT hr;
 
@@ -278,7 +278,7 @@ void DirectXCommon::InitializeFence()
 	assert(fenceEvent != nullptr);
 }
 
-void DirectXCommon::InitializeViewportAndScissorRect()
+void DirectXCommon::ViewportRectangleInitialization()
 {
 
 	viewport.Width = winApp_->kClientWidth;
@@ -290,7 +290,7 @@ void DirectXCommon::InitializeViewportAndScissorRect()
 
 }
 
-void DirectXCommon::InitializeScissorRect()
+void DirectXCommon::ScissorRectangleInitialization()
 {
 
 	scissorRect.left = 0;
@@ -299,7 +299,7 @@ void DirectXCommon::InitializeScissorRect()
 	scissorRect.bottom = winApp_->kClientHeight;
 }
 
-void DirectXCommon::CreateDXCCompiler()
+void DirectXCommon::DXCCompilerGenerate()
 {
 	HREFTYPE hr;
 
@@ -314,7 +314,7 @@ void DirectXCommon::CreateDXCCompiler()
 
 }
 
-void DirectXCommon::InitializeImGui()
+void DirectXCommon::ImGuiInitialization()
 {
 	// ImGuiの初期化
 	IMGUI_CHECKVERSION(); // ImGuiのバージョンチェック

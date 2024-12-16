@@ -17,29 +17,29 @@ public:
 	void Initialize(WinApp* winApp);
 
     // デバイスの生成
-    void CreateDevice();
+    void DeviceInitialization();
     // コマンド関連の初期化
-    void InitializeCommandObjects();
+    void CommandInitialization();
     // スワップチェーンの生成
-    void CreateSwapChain();
+    void SwapChainGenerate();
     // 深度バッファの生成
-    Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthBuffer();
+    Microsoft::WRL::ComPtr<ID3D12Resource> DepthBufferGenerate();
     // 各種デスクリプタヒープの生成
-    void CreateDescriptorHeaps();
+    void  DescriptorHeapGenerate();
     // レンダーターゲットビューの初期化
-    void InitializeRenderTargetView();
+    void RenderTargetViewInitialization();
     // 深度ステンシルビューの初期化
-    void InitializeDepthStencilView();
+    void DepthStencilViewInitialization();
     // フェンスの初期化
-    void InitializeFence();
+    void FenceInitialization();
     // ビューポート矩形の初期化
-    void InitializeViewportAndScissorRect();
+    void ViewportRectangleInitialization();
 	// シザリング矩形の初期化
-    void InitializeScissorRect();
+    void ScissorRectangleInitialization();
     // DXCコンパイラの生成
-    void CreateDXCCompiler();
+    void DXCCompilerGenerate();
     // ImGuiの初期化
-    void InitializeImGui();
+    void ImGuiInitialization();
     //描画前処理
     void PreDraw();
 	//描画後処理
