@@ -1442,8 +1442,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			  // 描画前処理
             dxCommon->PreDraw();
 
-			// 描画後処理
-            dxCommon->PostDraw();
+			
 
 			//if (input->Triggerkey(DIK_SPACE)) {
 			//	OutputDebugStringA("Hit 0\n");
@@ -1657,7 +1656,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//assert(SUCCEEDED(hr));
 
 
-			
+			// 描画後処理
+            dxCommon->PostDraw();
 			
 
 			////// 出力ウィンドウへの文字出力
