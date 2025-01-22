@@ -8,6 +8,8 @@
 #include "Logger.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include <dxcapi.h>
+#include "externals/DirectXTex/d3dx12.h"
+
 
 class DirectXCommon
 {
@@ -45,9 +47,7 @@ public:
 	//描画後処理
     void PostDraw();
 
-    //Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata);
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, 
-        D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+   
 
     /// <summary>
     /// 指定番号のCPUデスクリプタハンドルを取得する
@@ -67,6 +67,38 @@ public:
     /// SRVの指定番号のGPUデスクリプタハンドルを取得する
     /// </summary>
     D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
+
+     //getter
+    ID3D12Device* GetDevice() const { return device.Get(); }
+    ID3D12CommandList* GetCommandList() const { return commandList.Get(); }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDSVDescriptorHeap() const { return dsvDescriptorHeap; }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetRTVDescriptorHeap() const { return rtvDescriptorHeap; }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVDescriptorHeap() const { return srvDescriptorHeap; }
+    uint32_t GetDescriptorSizeRTV() const { return descriptorSizeRTV; }
+    uint32_t GetDescriptorSizeSRV() const { return descriptorSizeSRV; }
+
+    /// <summary>
+    /// バッファリソースの生成
+    /// </summary>
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
+
+    Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata);
+
+    /// <summary>
+    /// テクスチャデータの転送
+    /// </summary>
+    Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages);
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, 
+        D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+
+    /// <summary>
+    /// テクスチャファイルの読み込み
+    /// </summary>
+    /// <param name="filePath">テクスチャファイルのパス</param>
+    /// <returns>画像イメージデータ</returns>
+    static DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
 private:
 
