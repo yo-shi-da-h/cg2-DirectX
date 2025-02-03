@@ -70,7 +70,7 @@ public:
 
      //getter
     ID3D12Device* GetDevice() const { return device.Get(); }
-    ID3D12CommandList* GetCommandList() const { return commandList.Get(); }
+    ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDSVDescriptorHeap() const { return dsvDescriptorHeap; }
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetRTVDescriptorHeap() const { return rtvDescriptorHeap; }
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVDescriptorHeap() const { return srvDescriptorHeap; }
