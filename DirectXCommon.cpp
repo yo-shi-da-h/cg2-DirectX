@@ -20,6 +20,10 @@ void DirectXCommon::Initialize(WinApp* winApp) {
 	// メンバ変数に記録
 	this->winApp_ = winApp;
 
+	//FPS固定初期化
+	InitializeFixFPS();
+
+
 	// デバイスの生成
 	DeviceInitialization();
 	// コマンド関連の初期化
@@ -391,6 +395,8 @@ void DirectXCommon::PostDraw()
 	HRESULT hr = commandList->Close();
 	assert(SUCCEEDED(hr));
 
+	//FPS固定の処理
+	UpdateFixFPS();
 
 	// GPUにコマンドリストの実行を行わせる
 
@@ -418,6 +424,40 @@ void DirectXCommon::PostDraw()
 	assert(SUCCEEDED(hr));
 	hr = commandList->Reset(commandAllocator.Get(), nullptr);
 	assert(SUCCEEDED(hr));
+}
+
+void DirectXCommon::InitializeFixFPS()
+{
+		//FPS固定の初期化
+	reference_ = std::chrono::steady_clock::now();
+
+}
+
+void DirectXCommon::UpdateFixFPS()
+{
+	// 1/60秒ぴったりの時間
+	const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
+	// 1/60秒よりわずかに短い時間
+	const std::chrono::microseconds kMinCheckTime(uint64_t(1000000.0f / 65.0f));
+
+	// 現在時間を取得する
+	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+
+	// 前回記録からの経過時間を取得する
+	std::chrono::microseconds elapsed =
+		std::chrono::duration_cast<std::chrono::microseconds>(now - reference_);
+	// 1/60秒 (よりわずかに短い時間) 経っていない場合
+	if (elapsed < kMinTime) {
+
+		// 1/66秒経過するまで微小なスリープを繰り返す
+		while (std::chrono::steady_clock::now() - reference_ < kMinTime) {
+			// 1マイクロ秒スリープ
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+
+		}
+	}
+	// 現在の時間を記録する
+	reference_ = std::chrono::steady_clock::now();
 }
 
 Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)

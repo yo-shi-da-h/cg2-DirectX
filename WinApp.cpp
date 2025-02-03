@@ -1,5 +1,5 @@
 #include "WinApp.h"
-
+#pragma comment(lib, "winmm.lib")
 #include "externals/imgui/imgui.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wPARAm, LPARAM lParam);
 
@@ -71,6 +71,8 @@ void WinApp::Initialize()
 
 
 	ShowWindow(hwnd, SW_SHOW);
+
+	timeBeginPeriod(1);
 }
 
 void WinApp::Update()
