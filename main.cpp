@@ -1224,42 +1224,42 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 
-	//ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
+	ID3D12Resource* wvpResource = CreateBufferResource(dxCommon->GetDevice(), sizeof(Matrix4x4));
 
-	//Matrix4x4* wvpDate = nullptr;
+	Matrix4x4* wvpDate = nullptr;
 
-	//wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate));
+	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate));
 
-	//*wvpDate = MakeIdentity4x4();
+	*wvpDate = MakeIdentity4x4();
 
-	//VertexData* vertexData = nullptr;
+	VertexData* vertexData = nullptr;
 
-	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	////leftTop
-	//vertexData[0].position = { -0.5f, -0.5f,0.0f,1.0f };
-	//vertexData[0].texcoord = { 0.0f,1.0f };
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	//leftTop
+	vertexData[0].position = { -0.5f, -0.5f,0.0f,1.0f };
+	vertexData[0].texcoord = { 0.0f,1.0f };
 
-	////Top
-	//vertexData[1].position = { 0.0f, 0.5f,0.0f,1.0f };
-	//vertexData[1].texcoord = { 0.5f,0.0f };
+	//Top
+	vertexData[1].position = { 0.0f, 0.5f,0.0f,1.0f };
+	vertexData[1].texcoord = { 0.5f,0.0f };
 
-	////rightBottom
-	//vertexData[2].position = { 0.5f, -0.5f,0.0f,1.0f };
-	//vertexData[2].texcoord = { 1.0f,1.0f };
+	//rightBottom
+	vertexData[2].position = { 0.5f, -0.5f,0.0f,1.0f };
+	vertexData[2].texcoord = { 1.0f,1.0f };
 
 
 
-	////leftTop
-	//vertexData[3].position = { -0.5f, -0.5f,0.5f,1.0f };
-	//vertexData[3].texcoord = { 0.0f,1.0f };
+	//leftTop
+	vertexData[3].position = { -0.5f, -0.5f,0.5f,1.0f };
+	vertexData[3].texcoord = { 0.0f,1.0f };
 
-	////Top
-	//vertexData[4].position = { 0.0f, 0.0f,0.0f,1.0f };
-	//vertexData[4].texcoord = { 0.5f,0.0f };
+	//Top
+	vertexData[4].position = { 0.0f, 0.0f,0.0f,1.0f };
+	vertexData[4].texcoord = { 0.5f,0.0f };
 
-	////rightBottom
-	//vertexData[5].position = { 0.5f, -0.5f,-0.5f,1.0f };
-	//vertexData[5].texcoord = { 1.0f,1.0f };
+	//rightBottom
+	vertexData[5].position = { 0.5f, -0.5f,-0.5f,1.0f };
+	vertexData[5].texcoord = { 1.0f,1.0f };
 
 
 
@@ -1611,12 +1611,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			dxCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			//三角
-			//commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-			//commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
-			//commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-			//commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);	
-			//commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-			//commandList->DrawInstanced(6, 1, 0, 0);
+			//dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
+			//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
+			//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+			//dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);	
+			//dxCommon->GetCommandList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+			//dxCommon->GetCommandList()->DrawInstanced(6, 1, 0, 0);
 
 
 			//球体
@@ -1723,7 +1723,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	useAdapter->Release();
 	dxgiFactory->Release();*/
 
-	//wvpResource->Release();
+	wvpResource->Release();
 	//vertexResource->Release();
 
 	wvpResourceSphere->Release();
