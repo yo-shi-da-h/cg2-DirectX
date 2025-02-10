@@ -17,7 +17,10 @@ class DirectXCommon
 {
 public:
 
+    DirectXCommon();
+	~DirectXCommon();
 
+	// 初期化
 	void Initialize(WinApp* winApp);
 
     // デバイスの生成

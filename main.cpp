@@ -1269,7 +1269,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	uint32_t SphereVertexNum = 16 * 16 * 6;
 
 	//Sphere
-	/*ID3D12Resource* vertexResourceSphere = CreateBufferResource(device, sizeof(VertexData) * SphereVertexNum);
+	ID3D12Resource* vertexResourceSphere = CreateBufferResource(dxCommon->GetDevice(), sizeof(VertexData) * SphereVertexNum);
 
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
@@ -1278,7 +1278,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * SphereVertexNum;
 
-	vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);*/
+	vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResourceSphere = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
 
@@ -1486,7 +1486,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 
-			//transform.rotate.y += 0.03f;
+			transform.rotate.y += 0.03f;
 
 			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 			Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
@@ -1615,24 +1615,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
 			//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
 			//dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);	
-			//dxCommon->GetCommandList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+			////dxCommon->GetCommandList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 			//dxCommon->GetCommandList()->DrawInstanced(6, 1, 0, 0);
 
 
 			//球体
-			//commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
-			//commandList->SetGraphicsRootConstantBufferView(0, materialResourceSphere->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
-			//commandList->SetGraphicsRootConstantBufferView(1, wvpResourceSphere->GetGPUVirtualAddress());
+			//dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
+			//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourceSphere->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
+			//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResourceSphere->GetGPUVirtualAddress());
 
 			//if (textureChange == 0) {
-			//	commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+			//	dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 			//}
 			//else {
-			//	commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
+			//	dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
 			//}
-			//commandList->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
-			//commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-			//commandList->DrawInstanced(SphereVertexNum, 1, 0, 0);
+			//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
+			////dxCommon->GetCommandList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+			//dxCommon->GetCommandList()->DrawInstanced(SphereVertexNum, 1, 0, 0);
 
 
 			//model
