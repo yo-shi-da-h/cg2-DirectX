@@ -56,6 +56,7 @@ public:
     // FPS固定更新
     void UpdateFixFPS();
    
+    void Finalize();
 
     /// <summary>
     /// 指定番号のCPUデスクリプタハンドルを取得する

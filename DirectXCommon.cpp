@@ -21,16 +21,7 @@ DirectXCommon::DirectXCommon()
 DirectXCommon::~DirectXCommon()
 {
 
-	// ImGuiの終了処理
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
-
-	// フェンスイベントの解放
-	if (fenceEvent) {
-		CloseHandle(fenceEvent);
-		fenceEvent = nullptr;
-	}
+	
 }
 
 void DirectXCommon::Initialize(WinApp* winApp) {
@@ -477,6 +468,21 @@ void DirectXCommon::UpdateFixFPS()
 	}
 	// 現在の時間を記録する
 	reference_ = std::chrono::steady_clock::now();
+}
+
+void DirectXCommon::Finalize()
+{
+
+	// ImGuiの終了処理
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+
+	// フェンスイベントの解放
+	if (fenceEvent) {
+		CloseHandle(fenceEvent);
+		fenceEvent = nullptr;
+	}
 }
 
 Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)

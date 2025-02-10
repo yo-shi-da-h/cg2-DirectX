@@ -98,7 +98,7 @@ bool WinApp::ProcessMessage()
 
 	if (msg.message == WM_QUIT) 
 	{
-		return false;
+		return true;
 	}
 
 	return false;
