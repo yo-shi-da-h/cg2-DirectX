@@ -1757,7 +1757,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	materialResourceSprite->Release();
 
 #ifdef _DEBUG
-	debugController->Release();
+	//debugController->Release();
 #endif
 
 	/*mipImages.Release();*/
