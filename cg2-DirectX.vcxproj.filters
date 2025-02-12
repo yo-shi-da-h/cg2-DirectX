@@ -101,9 +101,6 @@
     <ClInclude Include="Vector3.h">
       <Filter>ソース ファイル\ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>ソース ファイル\ヘッダー ファイル</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">

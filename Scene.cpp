@@ -13,9 +13,9 @@ void Scene::SetState(SceneState* state) {
     }
 }
 
-void Scene::Update(Transform1& transform) {
+void Scene::Update(Transform1& transform1) {
     if (currentState) {
-        currentState->Update(transform);
+        currentState->Update(transform1);
     }
 }
 

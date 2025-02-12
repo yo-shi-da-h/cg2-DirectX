@@ -8,7 +8,7 @@ public:
     Scene();
 
     void SetState(SceneState* state);
-    void Update(Transform1& transform);
+    void Update(Transform1& transform1);
     void Draw();
 
 private:
