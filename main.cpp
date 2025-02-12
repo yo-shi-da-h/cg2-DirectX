@@ -506,7 +506,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//リソースの先頭アドレス
 	indexBufferViewSprite.BufferLocation = indexResourceSprite->GetGPUVirtualAddress();
 	//使用するリソースサイズ
-	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
+	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 3;
 	//頂点サイズ
 	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
 
