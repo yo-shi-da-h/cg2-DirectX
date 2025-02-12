@@ -21,6 +21,7 @@
 #include "Scene.h"
 #include "Title.h"
 #include "Transform1.h"
+#include "Transform.h"
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxcompiler.lib")
@@ -238,11 +239,7 @@ Matrix4x4 MakeTranslateMatrix(Vector3 translate) {
 	return result;
 }
 
-struct Transform {
-	Vector3 scale;
-	Vector3 rotate;
-	Vector3 translate;
-};
+
 
 #pragma region Affine
 
