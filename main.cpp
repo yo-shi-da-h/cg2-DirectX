@@ -17,6 +17,10 @@
 #include <fstream>
 #include <sstream>
 #include "Input.h"
+#include "Vector3.h"
+#include "Scene.h"
+#include "Title.h"
+#include "Transform1.h"
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxcompiler.lib")
@@ -129,11 +133,7 @@ struct Vector2 {
 	float y;
 };
 
-struct Vector3 {
-	float x;
-	float y;
-	float z;
-};
+
 
 struct Vector4 {
 	float x;
@@ -1001,6 +1001,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	        input = new Input();
 	        input->Initialize(winApp);
 
+	Scene sceneManager;
+	TitleScene titleScene;
+
+	sceneManager.SetState(&titleScene);
+
 #pragma endregion
 
 #ifdef _DEBUG
@@ -1744,6 +1749,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			if (input->Triggerkey(DIK_SPACE)) {
 				OutputDebugStringA("Hit 0\n");
 			}
+			sceneManager.Update(transform);
 	       
 			//ゲームの処理
 
