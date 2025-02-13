@@ -155,7 +155,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxCommon->Initialize(winApp);
 
 
-	ShowWindow(winApp->GetHwnd(), SW_SHOW);
 
 
 	//textureを読んで転送
