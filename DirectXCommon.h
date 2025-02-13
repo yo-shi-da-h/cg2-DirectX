@@ -58,6 +58,9 @@ public:
    
     void Finalize();
 
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, 
+        D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+
     /// <summary>
     /// 指定番号のCPUデスクリプタハンドルを取得する
     /// </summary>
@@ -99,8 +102,7 @@ public:
     /// テクスチャデータの転送
     /// </summary>
     Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages);
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, 
-        D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+    
 
     /// <summary>
     /// テクスチャファイルの読み込み
@@ -108,6 +110,8 @@ public:
     /// <param name="filePath">テクスチャファイルのパス</param>
     /// <returns>画像イメージデータ</returns>
     static DirectX::ScratchImage LoadTexture(const std::string& filePath);
+
+     Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
 
 private:
 
