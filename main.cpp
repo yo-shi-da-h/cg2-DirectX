@@ -639,9 +639,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	     
 			//ゲームの処理
 
-			ImGui_ImplDX12_NewFrame();
+			/*ImGui_ImplDX12_NewFrame();
 			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
+			ImGui::NewFrame();*/
 
 			transform.rotate.y += 0.03f;
 
@@ -682,41 +682,41 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
 			materialDateSprite->uvTransform = uvTransformMatrix;
 
-			//開発用UIの処理
-			ImGui::ShowDemoWindow();
+			////開発用UIの処理
+			//ImGui::ShowDemoWindow();
 
-			//ここにテキストを入れられる
-			ImGui::Text("ImGuiText");
+			////ここにテキストを入れられる
+			//ImGui::Text("ImGuiText");
 
-			ImGui::Text("Sphere");
-			ImGui::InputFloat3("MaterialSphere", *inputMaterialSphere);
-			ImGui::SliderFloat3("SliderMaterialSphere", *inputMaterialSphere, 0.0f, 1.0f);
+			//ImGui::Text("Sphere");
+			//ImGui::InputFloat3("MaterialSphere", *inputMaterialSphere);
+			//ImGui::SliderFloat3("SliderMaterialSphere", *inputMaterialSphere, 0.0f, 1.0f);
 
-			ImGui::InputFloat3("VertexSphere", *inputTransformSphere);
-			ImGui::SliderFloat3("SliderVertexSphere", *inputTransformSphere, -5.0f, 5.0f);
+			//ImGui::InputFloat3("VertexSphere", *inputTransformSphere);
+			//ImGui::SliderFloat3("SliderVertexSphere", *inputTransformSphere, -5.0f, 5.0f);
 
-			ImGui::InputFloat3("RotateSphere", *inputRotateSphere);
-			ImGui::SliderFloat3("SliderRotateSphere", *inputRotateSphere, -10.0f, 10.0f);
+			//ImGui::InputFloat3("RotateSphere", *inputRotateSphere);
+			//ImGui::SliderFloat3("SliderRotateSphere", *inputRotateSphere, -10.0f, 10.0f);
 
-			ImGui::InputFloat3("ScaleSphere", *inputScaleSphere);
-			ImGui::SliderFloat3("SliderScaleSphere", *inputScaleSphere, 0.5f, 5.0f);
+			//ImGui::InputFloat3("ScaleSphere", *inputScaleSphere);
+			//ImGui::SliderFloat3("SliderScaleSphere", *inputScaleSphere, 0.5f, 5.0f);
 
-			ImGui::InputFloat("SphereTexture", &textureChange);
+			//ImGui::InputFloat("SphereTexture", &textureChange);
 
-			ImGui::Text("Sprite");
-			ImGui::InputFloat("SpriteX", &transformSprite.translate.x);
-			ImGui::SliderFloat("SliderSpriteX", &transformSprite.translate.x, 0.0f, 1000.0f);
+			//ImGui::Text("Sprite");
+			//ImGui::InputFloat("SpriteX", &transformSprite.translate.x);
+			//ImGui::SliderFloat("SliderSpriteX", &transformSprite.translate.x, 0.0f, 1000.0f);
 
-			ImGui::InputFloat("SpriteY", &transformSprite.translate.y);
-			ImGui::SliderFloat("SliderSpriteY", &transformSprite.translate.y, 0.0f, 600.0f);
+			//ImGui::InputFloat("SpriteY", &transformSprite.translate.y);
+			//ImGui::SliderFloat("SliderSpriteY", &transformSprite.translate.y, 0.0f, 600.0f);
 
-			ImGui::InputFloat("SpriteZ", &transformSprite.translate.z);
-			ImGui::SliderFloat("SliderSpriteZ", &transformSprite.translate.z, 0.0f, 0.0f);
+			//ImGui::InputFloat("SpriteZ", &transformSprite.translate.z);
+			//ImGui::SliderFloat("SliderSpriteZ", &transformSprite.translate.z, 0.0f, 0.0f);
 
 
-			ImGui::DragFloat2("UVTranlate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-			ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-			ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
+			//ImGui::DragFloat2("UVTranlate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+			//ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+			//ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
 
 
 
@@ -742,14 +742,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResourceSphere->GetGPUVirtualAddress());
 			//Yosida:ここでテクスチャの変更を行う
 
-			if (textureChange == 0) {
+			/*if (textureChange == 0) {
 				dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 			}
 			else {
 				dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
-			}
+			}*/
 
-			dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
+			//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
 
 			//dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
@@ -767,7 +767,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//dxCommon->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 			//実際のcommandListのImGui描画コマンドを挟む
-			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
+			//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
 
 
 			// 描画後処理
