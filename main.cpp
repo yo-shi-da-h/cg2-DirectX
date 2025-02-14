@@ -17,6 +17,8 @@
 #include <format>
 #include "D3ResouceLeakChecker.h"
 #include "MyMatrix.h"
+#include "SpriteCommon.h"
+#include "Sprite.h"
 
 using namespace StringUtility;
 #pragma comment(lib,"dxcompiler.lib")
@@ -154,7 +156,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(winApp);
 
+	SpriteCommon* spriteCommon = nullptr;
+	spriteCommon = new SpriteCommon();
+	spriteCommon->Initialize();
 
+	Sprite* sprite = new Sprite();
+	sprite->Initialize();
 
 
 	//textureを読んで転送
@@ -788,7 +795,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxCommon->Finalize();
 	delete dxCommon;
 	delete input;
-	
+	delete sprite;
+	delete spriteCommon;
 	
 
 
