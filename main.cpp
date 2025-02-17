@@ -158,7 +158,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	SpriteCommon* spriteCommon = nullptr;
 	spriteCommon = new SpriteCommon();
-	spriteCommon->Initialize();
+	spriteCommon->Initialize(dxCommon);
 
 	Sprite* sprite = new Sprite();
 	sprite->Initialize();
